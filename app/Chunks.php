@@ -16,6 +16,19 @@ class Chunks extends Model
         'title', 'body', 'author', 'created_at', 'updated_at', 'status',
     ];
 
+    static protected $selectedFields = [
+        'chunks.id',
+        'chunks.title',
+        'chunks.body',
+        'chunks.author',
+        'chunks.created_at',
+        'chunks.updated_at',
+        'chunks.status',
+        'mixins.type as type',
+        'mixins.title as mixins_title',
+        'mixins.id as mixins_id',
+    ];
+
     static public function defaultFormData()
     {
         return (object) [
@@ -40,18 +53,7 @@ class Chunks extends Model
     static public function getChunksMixins()
     {
         $chunks = DB::table('chunks')
-            ->select([
-                'chunks.id',
-                'chunks.title',
-                'chunks.body',
-                'chunks.author',
-                'chunks.created_at',
-                'chunks.updated_at',
-                'chunks.status',
-                'mixins.type as type',
-                'mixins.title as mixins_title',
-                'mixins.id as mixins_id',
-            ])
+            ->select(self::$selectedFields)
             ->join('mixins', 'mixins.id_chunk', '=', 'chunks.id')
             ->get();
 
@@ -61,20 +63,31 @@ class Chunks extends Model
     static public function getChunksByType($type)
     {
         $chunks = DB::table('chunks')
-            ->select([
-                'chunks.id',
-                'chunks.title',
-                'chunks.body',
-                'chunks.author',
-                'chunks.created_at',
-                'chunks.updated_at',
-                'chunks.status',
-                'mixins.type as type',
-                'mixins.title as mixins_title',
-                'mixins.id as mixins_id',
-            ])
-            ->leftJoin('mixins', 'mixins.id', '=', 'chunks.id')
+            ->select(self::$selectedFields)
+            ->leftJoin('mixins', 'mixins.id_chunk', '=', 'chunks.id')
             ->where('mixins.type', '=', $type)
+            ->get();
+
+        return $chunks;
+    }
+
+    static public function getChunksByTitle($title)
+    {
+        $chunks = DB::table('chunks')
+            ->select(self::$selectedFields)
+            ->leftJoin('mixins', 'mixins.id_chunk', '=', 'chunks.id')
+            ->where('chunks.title', '=', $title)
+            ->get();
+
+        return $chunks;
+    }
+
+    static public function getMixinsByTitle($title)
+    {
+        $chunks = DB::table('chunks')
+            ->select(self::$selectedFields)
+            ->leftJoin('mixins', 'mixins.id_chunk', '=', 'chunks.id')
+            ->where('mixins.title', '=', $title)
             ->get();
 
         return $chunks;
@@ -108,9 +121,9 @@ class Chunks extends Model
     }
 
     static public function incomplete () {
-        return static::where('status', 0)
-            ->leftJoin('mixins', 'mixins.id', '=', 'chunks.id')
-            ->get();
+//        return static::where('status', 0)
+//            ->leftJoin('mixins', 'mixins.id', '=', 'chunks.id')
+//            ->get();
     }
 
 }

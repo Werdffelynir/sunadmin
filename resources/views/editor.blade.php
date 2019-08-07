@@ -11,7 +11,7 @@
             <input type="text"
                    name="type"
                    class="form-control"
-                   placeholder="Type"
+                   placeholder=""
                    aria-label="Type"
                    value="{{$chunk->type}}">
 
@@ -38,7 +38,7 @@
             <input type="text"
                    name="title"
                    class="form-control"
-                   placeholder="Title"
+                   placeholder=""
                    aria-label="Title"
                    aria-describedby="basic-title"
                    value="{{$chunk->title}}" >
@@ -46,7 +46,7 @@
 
         <div class="input-group mb-3">
             <div class="input-group-prepend">
-                <span class="input-group-text">With textarea</span>
+                <span class="input-group-text">HTML Body</span>
             </div>
             <textarea
                 name="body"
