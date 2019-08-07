@@ -29,9 +29,9 @@ class Chunks extends Model
         'mixins.id as mixins_id',
     ];
 
-    static public function defaultFormData()
+    static public function defaultFormData(array $data = null)
     {
-        return (object) [
+        $defaultData = [
             'title' => '',
             'body' => '',
             'author' => '',
@@ -41,13 +41,21 @@ class Chunks extends Model
             'type' => '',
             'mixins_id' => '',
         ];
+        if ($data) {
+            $defaultData = array_merge($defaultData, $data);
+        }
+        return (object) $defaultData;
     }
 
-    public function getChunk($id)
+    static public function getChunk($id)
     {
-        $chunk = $this->query()->select('*')->where(['id' => $id]);
+        $chunks = DB::table('chunks')
+            ->select(self::$selectedFields)
+            ->leftJoin('mixins', 'mixins.id_chunk', '=', 'chunks.id')
+            ->where('chunks.id', '=', $id)
+            ->get();
 
-        return $chunk;
+        return $chunks;
     }
 
     static public function getChunksMixins()
@@ -121,9 +129,9 @@ class Chunks extends Model
     }
 
     static public function incomplete () {
-//        return static::where('status', 0)
-//            ->leftJoin('mixins', 'mixins.id', '=', 'chunks.id')
-//            ->get();
+        return static::where('status', 0)
+            ->leftJoin('mixins', 'mixins.id', '=', 'chunks.id')
+            ->get();
     }
 
 }

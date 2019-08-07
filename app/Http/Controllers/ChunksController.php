@@ -29,7 +29,7 @@ class ChunksController extends Controller
         return view('chunks');
     }
 
-    public function list($page = 1)
+    public function list()
     {
         $chunks = Chunks::getChunksMixins();
 
@@ -38,15 +38,32 @@ class ChunksController extends Controller
         ]);
     }
 
-    public function create($chunk = null)
+    public function edit($id)
     {
-        $chunk = $chunk ? $chunk : Chunks::defaultFormData();
+        $chunk = Chunks::getChunk($id);
+
+        if ($chunk) {
+            return $this->create((array) $chunk->first());
+        }
+        else
+            return $this->list();
+    }
+
+    public function create(array $chunk = null)
+    {
+        $chunk = Chunks::defaultFormData($chunk);
         $types = Mixins::getMixinTypes();
 
-        return view('editor', [
-            'chunk' => $chunk,
-            'types' => $types,
-        ]);
+        if ($chunk) {
+            if (!$chunk->type)
+                $chunk->type = 'main';
+
+            return view('editor', [
+                'chunk' => $chunk,
+                'types' => $types,
+            ]);
+        }
+        return null;
     }
 
 

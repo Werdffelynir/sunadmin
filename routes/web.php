@@ -21,7 +21,7 @@ Route::get('/', function () {
 
 Route::get('/chunks', 'ChunksController@list')->name('chunks');
 Route::get('/chunk/create', 'ChunksController@create')->name('chunks/create');
-Route::get('/chunk/edit/id', 'ChunksController@create')->name('chunks/create');
+Route::get('/chunk/edit/{id}', 'ChunksController@edit')->name('chunks/edit');
 Route::post('/chunk/save', 'ChunksController@save')->name('chunks/save');
 Route::post('/chunk/delete/id', 'ChunksController@create')->name('chunks/create');
 
