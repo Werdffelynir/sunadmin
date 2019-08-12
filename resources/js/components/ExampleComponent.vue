@@ -16,8 +16,17 @@
 
 <script>
     export default {
+        props: ['message'],
+
+        data() {
+            return {
+                body: this.message
+            }
+        },
+
         mounted() {
             console.log('Component mounted.')
-        }
+        },
+
     }
 </script>

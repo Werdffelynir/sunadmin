@@ -125,13 +125,40 @@ class Chunks extends Model
 
         DB::commit();
 
-        return $mixin;
+        return $chunkId;
     }
 
     static public function incomplete () {
         return static::where('status', 0)
             ->leftJoin('mixins', 'mixins.id', '=', 'chunks.id')
             ->get();
+    }
+
+    static public function updateChunk ($chunkId, $data, $type, $mixinsId) {
+
+        DB::beginTransaction();
+
+        $result =  DB::table('mixins')->where('id', $mixinsId)->get()->first();
+
+
+        if ($result && $result->type !== $type) {
+            $result = DB::table('mixins')
+                ->where('id', $mixinsId)
+                ->update([
+                    'type' => $type,
+                    'title' => $type,
+                    'updated_at' => date('Y-m-d H:i:s'),
+                ]);
+        }
+
+        $data['updated_at'] = date('Y-m-d H:i:s');
+        $result = DB::table('chunks')
+            ->where('id', $chunkId)
+            ->update($data);
+
+        DB::commit();
+
+        return !!$result;
     }
 
 }

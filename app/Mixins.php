@@ -24,8 +24,9 @@ class Mixins extends Model
     static public function getMixinTypes()
     {
         $mixins = DB::table('mixins')
-            ->select(['type'])
             ->distinct()
+            ->select(['id', 'type'])
+            ->groupBy('id')
             ->get();
 
         return $mixins;

@@ -8,7 +8,7 @@ require('./bootstrap');
 
 window.Vue = require('vue');
 
-// import store from './store/index'
+import store from './store/index'
 
 /**
  * The following block of code may be used to automatically register your
@@ -34,5 +34,5 @@ Vue.component('chunkform', require('./components/ChunkFromComponent.vue').defaul
 
 const app = new Vue({
     el: '#app',
-    // store
+    store
 });

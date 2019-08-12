@@ -71,7 +71,11 @@
             </div>
         </div>
 
-        <chunkform></chunkform>
+
+        <input class="form-control" type="text" name="id" value="{{ isset($chunk->id) ? $chunk->id : '' }}">
+        <input class="form-control" type="text" name="mixins_id" value="{{ isset($chunk->mixins_id) ? $chunk->mixins_id : '' }}">
+
+        <chunkform message="{{ json_encode( ['chunks'=>$chunk, 'types'=>$types] ) }}" ></chunkform>
 
     </div>
 @endsection
