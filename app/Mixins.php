@@ -25,8 +25,7 @@ class Mixins extends Model
     {
         $mixins = DB::table('mixins')
             ->distinct()
-            ->select(['id', 'type'])
-            ->groupBy('id')
+            ->select(['type'])
             ->get();
 
         return $mixins;

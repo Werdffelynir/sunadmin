@@ -4,11 +4,15 @@
  * building robust, powerful web applications using Vue and Laravel.
  */
 
-require('./bootstrap');
+// require('./bootstrap');
+import './bootstrap';
+import BootstrapVue from 'bootstrap-vue';
+import store from './store/index';
+
 
 window.Vue = require('vue');
 
-import store from './store/index'
+Vue.use(BootstrapVue);
 
 /**
  * The following block of code may be used to automatically register your
@@ -20,11 +24,10 @@ import store from './store/index'
 
 // const files = require.context('./', true, /\.vue$/i);
 // files.keys().map(key => Vue.component(key.split('/').pop().split('.')[0], files(key).default));
-
-Vue.component('example-component', require('./components/ExampleComponent.vue').default);
-
-// <chunkform-component></chunkform-component>
-Vue.component('chunkform', require('./components/ChunkFromComponent.vue').default);
+// Vue.component('example-component', require('./components/ExampleComponent.vue').default);
+// Vue.component('chunkform', require('./components/ChunkFromComponent.vue').default);
+Vue.component('records-component', require('./components/RecordsComponent.vue').default);
+Vue.component('edit-component', require('./components/EditComponent.vue').default);
 
 /**
  * Next, we will create a fresh Vue application instance and attach it to

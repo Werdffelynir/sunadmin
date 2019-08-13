@@ -34,7 +34,7 @@
         <div id="page">
             <nav class="navbar navbar-expand-md navbar-dark bg-dark shadow-sm">
                 <div class="container">
-                    <a class="navbar-brand" href="{{ url('/') }}">
+                    <a class="navbar-brand" href="{{ url('/dashboard') }}">
                         {{ config('app.name', 'Laravel') }}
                     </a>
                     <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="{{ __('Toggle navigation') }}">
@@ -45,10 +45,9 @@
                         <!-- Left Side Of Navbar -->
                     @auth
                         <ul class="navbar-nav mr-auto topmenu">
-                            <li><a href="{{ url('/chunks') }}">Chunks</a></li>
-                            <li><a href="{{ url('/chunk/create') }}">New Chunk</a></li>
+                            <li><a href="{{ url('/list') }}">Chunks</a></li>
+                            <li><a href="{{ url('/chunk/editor') }}">New Chunk</a></li>
                             <li><a href="{{ url('/mixins') }}">Mixins</a></li>
-                            <li><a href="{{ url('/mixin/create') }}">New Mixin</a></li>
                         </ul>
                     @endauth
 

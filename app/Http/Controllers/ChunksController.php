@@ -19,46 +19,43 @@ class ChunksController extends Controller
         $this->middleware('auth');
     }
 
-    /**
-     * Show the application dashboard.
-     *
-     * @return \Illuminate\Contracts\Support\Renderable
-     */
-    public function index()
-    {
-        return view('chunks');
-    }
-
     public function list()
     {
-        $chunks = Chunks::getChunksMixins();
+        $chunks = Chunks::getChunksByType('main');
+        $types = Mixins::getMixinTypes();
 
-        return view('chunks', [
-            'chunks' => $chunks
+        return view('records', [
+            'chunks' => $chunks,
+            'types' => $types,
         ]);
     }
 
-    public function edit($id)
-    {
-        $chunk = Chunks::getChunk($id);
 
-        if ($chunk) {
-            return $this->create((array) $chunk->first());
-        }
-        else
-            return $this->list();
+    public function chunksType()
+    {
+        $type = trim(\request('type'));
+        $chunks = Chunks::getChunksByType($type);
+
+        return response()->json( [
+            'chunks' => $chunks,
+        ]);
     }
 
-    public function create(array $chunk = null)
+    public function editor($id = null)
     {
-        $chunk = Chunks::defaultFormData($chunk);
+        $chunk = Chunks::defaultFormData();
         $types = Mixins::getMixinTypes();
+
+        if ($id && $chunk = Chunks::getChunk($id)) {
+            $chunk = $chunk->first();
+        }
 
         if ($chunk) {
             if (!$chunk->type)
                 $chunk->type = 'main';
+            $chunk->status = !!$chunk->status;
 
-            return view('editor', [
+            return view('edit', [
                 'chunk' => $chunk,
                 'types' => $types,
             ]);
@@ -66,12 +63,12 @@ class ChunksController extends Controller
         return null;
     }
 
+    public function save() {
 
-    public function save()
-    {
         $insertSuccess = "require";
         $fields = ['title', 'body', 'author', 'updated_at', 'status' ];
         $requires = ['title', 'body'];
+
         $data = [];
         $id = trim(\request('id'));
         $type = trim(\request('type'));
@@ -79,24 +76,18 @@ class ChunksController extends Controller
 
         array_map(function ($it) use (&$data) {
             $value = \request($it);
-            if ($value !== null) {
+            if ($value !== null)
                 $data[$it] = $value;
-            }
-
         }, $fields);
+
+        $data['status'] = $data['status'] ? 1 : 0;
 
         if (array_filter($requires, function ($k) use ($data) {return empty($data[$k]);})) {
             return response()->json( $insertSuccess);
         }
 
+
         if ($id) {
-
-
-            print_r($id);
-            print_r($data);
-            print_r($type);
-            print_r($mixins_id);
-            die;
             $insertSuccess = Chunks::updateChunk($id, $data, $type, $mixins_id) ? "ok" : "err";
         } else {
             $insertSuccess = Chunks::insertChunk(
