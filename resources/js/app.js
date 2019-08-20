@@ -9,10 +9,16 @@ import './bootstrap';
 import BootstrapVue from 'bootstrap-vue';
 import store from './store/index';
 
+// import { library } from '@fortawesome/fontawesome-svg-core';
+// import { faUserSecret } from '@fortawesome/free-solid-svg-icons';
+// import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 
 window.Vue = require('vue');
 
-Vue.use(BootstrapVue);
+window.Vue.use(BootstrapVue);
+
+// library.add(faUserSecret);
+// window.Vue.component('font-awesome-icon', FontAwesomeIcon);
 
 /**
  * The following block of code may be used to automatically register your

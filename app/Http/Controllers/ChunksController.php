@@ -4,8 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Chunks;
 use App\Mixins;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
+
 
 class ChunksController extends Controller
 {
@@ -46,68 +45,59 @@ class ChunksController extends Controller
         $chunk = Chunks::defaultFormData();
         $types = Mixins::getMixinTypes();
 
-        if ($id && $chunk = Chunks::getChunk($id)) {
-            $chunk = $chunk->first();
-        }
-
-        if ($chunk) {
-            if (!$chunk->type)
-                $chunk->type = 'main';
-            $chunk->status = !!$chunk->status;
-
-            return view('edit', [
-                'chunk' => $chunk,
-                'types' => $types,
-            ]);
-        }
-        return null;
-    }
-
-    public function save() {
-
-        $insertSuccess = "require";
-        $fields = ['title', 'body', 'author', 'updated_at', 'status' ];
-        $requires = ['title', 'body'];
-
-        $data = [];
-        $id = trim(\request('id'));
-        $type = trim(\request('type'));
-        $mixins_id = trim(\request('mixins_id'));
-
-        array_map(function ($it) use (&$data) {
-            $value = \request($it);
-            if ($value !== null)
-                $data[$it] = $value;
-        }, $fields);
-
-        $data['status'] = $data['status'] ? 1 : 0;
-
-        if (array_filter($requires, function ($k) use ($data) {return empty($data[$k]);})) {
-            return response()->json( $insertSuccess);
-        }
-
-
         if ($id) {
-            $insertSuccess = Chunks::updateChunk($id, $data, $type, $mixins_id) ? "ok" : "err";
-        } else {
-            $insertSuccess = Chunks::insertChunk(
-                $data['title'],
-                $data['body'],
-                "Anonymous",
-                empty($data['status']) ? 0 : 1,
-                $type
-            ) ;
+            $chunk = Chunks::getChunk($id);
+            $chunk->status = !!$chunk->status;
         }
 
-        return response()->json( [
-            'status' => $insertSuccess ? "ok" : "err",
-            'id' => $insertSuccess,
-            'event' => $id ? 'update' : 'insert',
+        return view('edit', [
+            'chunk' => $chunk,
+            'types' => $types,
         ]);
     }
 
-    public function delete()
-    {
+    public function save() {
+        $id = trim(\request('id'));
+        $mixins = \request('mixins');
+        if (empty($mixins))
+            $mixins = [['type' => 'main']];
 
+        $data = [
+            'title' => trim(\request('title')),
+            'body' => trim(\request('body')),
+            'author' => \request('author') ? trim(\request('author')) : 'Anonymous',
+            'updated_at' => date('Y-m-d H:i:s'),
+            'status' => \request('status') ? 1 : 0,
+        ];
+
+        if ($id) {
+            $result = Chunks::updateChunk($id, $data, $mixins) ? "ok" : "err";
+        } else {
+            $result = Chunks::insertChunk($data, $mixins );
+        }
+
+        return response()->json( [
+            'status' => $result ? "ok" : "err",
+            'id' => $result,
+            'event' => $id ? 'update' : 'insert',
+        ]);
+
+    }
+
+    public function remove()
+    {
+        $success = false;
+        $id = trim(\request('id'));
+        $mixins_id = trim(\request('mixins_id'));
+
+        if ($id && $mixins_id) {
+            $success = Chunks::removeChunk($id, $mixins_id);
+        }
+
+        return response()->json( [
+            'status' => $success ? "ok" : "err",
+            'id' => $id,
+            'event' => 'remove',
+        ]);
     }
 }

@@ -6,9 +6,13 @@
             </ul>
         </div>
         <div class="">
-            <ul class="records-menu">
-                <li v-for="chunk in chunks">
-                    <a v-bind:href="'/chunk/editor/' + chunk.id">{{chunk.title}}</a>
+            <ul class="records-menu-chunks">
+                <li v-for="chunk in chunks" class="table-grid">
+                    <span><a v-bind:href="'/chunk/editor/' + chunk.id">{{chunk.title}}</a></span>
+                    <span class="w-25">
+                        <span v-if="chunk.status"> <i></i> </span>
+                        <span v-else=""> <i>off</i> </span>
+                    </span>
                 </li>
             </ul>
         </div>
@@ -23,7 +27,7 @@
         color: #343a40;
     }
 
-    .records-menu {
+    .records-menu, .records-menu-chunks {
         list-style: none;
         padding: 0;
         margin: 0;
@@ -33,6 +37,9 @@
     }
     .records-menu li:hover {
         text-decoration: underline;
+    }
+    .records-menu-chunks li {
+        border-bottom: 1px solid #fff;
     }
 
     .active {

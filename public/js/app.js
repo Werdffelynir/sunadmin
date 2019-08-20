@@ -1898,6 +1898,27 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+var URL_LIST = '/list';
 var URL_SAVE = '/chunk/editor/';
 /* harmony default export */ __webpack_exports__["default"] = ({
   props: ['datachunk', 'datatypes'],
@@ -1906,30 +1927,67 @@ var URL_SAVE = '/chunk/editor/';
       chunk: JSON.parse(this.datachunk),
       types: JSON.parse(this.datatypes),
       loading: false,
-      checked: false
+      checked: false,
+      selectedType: '',
+      chunkmixins: JSON.parse(this.datachunk).mixins.slice(0)
     };
   },
+  computed: {},
   mounted: function mounted() {},
   methods: {
     selectType: function selectType(e) {
-      this.chunk.type = e.target.textContent;
+      this.selectedType = e.target.textContent;
     },
     inputType: function inputType(e) {
-      this.chunk.type = e;
+      this.selectedType = e;
     },
-    save: function save(e) {
+    chunkmixinRemove: function chunkmixinRemove(type) {
       var _this = this;
 
+      this.chunkmixins.forEach(function (m, i) {
+        if (m.type === type) _this.chunkmixins.splice(i, 1);
+      });
+    },
+    addType: function addType(e) {
+      var _this2 = this;
+
+      if (!!this.selectedType && !this.chunkmixins.filter(function (m) {
+        return m.type === _this2.selectedType;
+      }).length) {
+        this.chunkmixins.push({
+          type: this.selectedType
+        });
+        this.selectedType = '';
+      }
+    },
+    save: function save(e) {
+      var _this3 = this;
+
       this.loading = true;
-      axios.post('/chunk/save', this.chunk).then(function (res) {
+      var chunk = Object.assign({}, this.chunk);
+      chunk.mixins = this.chunkmixins;
+      axios.post('/chunk/save', chunk).then(function (res) {
         if (res.data.status === 'ok' && res.data.event === 'insert' && res.data.id) location.href = URL_SAVE + res.data.id;
-        _this.loading = false;
+        _this3.loading = false;
       })["catch"](function (err) {
-        _this.loading = false;
+        _this3.loading = false;
       });
     },
     remove: function remove(e) {
+      var _this4 = this;
+
       console.log('remove', e);
+      this.loading = true;
+      axios.post('/chunk/remove', this.chunk).then(function (res) {
+        if (res.data.status === 'ok') location.href = URL_LIST;
+        _this4.loading = false;
+      })["catch"](function (err) {
+        _this4.loading = false;
+      });
+    },
+    nameToId: function nameToId(name) {
+      var n = name.toLowerCase().replace(/(\s)/, '_');
+      return n;
     }
   }
 });
@@ -1945,6 +2003,13 @@ var URL_SAVE = '/chunk/editor/';
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
+//
+//
+//
+//
+//
+//
+//
 //
 //
 //
@@ -34509,7 +34574,7 @@ exports = module.exports = __webpack_require__(/*! ../../../node_modules/css-loa
 
 
 // module
-exports.push([module.i, "\n.records-bar {\n    width: 20%;\n    height: 100%;\n    color: #343a40;\n}\n.records-menu {\n    list-style: none;\n    padding: 0;\n    margin: 0;\n}\n.records-menu li {\n    cursor: pointer;\n}\n.records-menu li:hover {\n    text-decoration: underline;\n}\n.active {\n    text-decoration: underline;\n}\n", ""]);
+exports.push([module.i, "\n.records-bar {\n    width: 20%;\n    height: 100%;\n    color: #343a40;\n}\n.records-menu, .records-menu-chunks {\n    list-style: none;\n    padding: 0;\n    margin: 0;\n}\n.records-menu li {\n    cursor: pointer;\n}\n.records-menu li:hover {\n    text-decoration: underline;\n}\n.records-menu-chunks li {\n    border-bottom: 1px solid #fff;\n}\n.active {\n    text-decoration: underline;\n}\n", ""]);
 
 // exports
 
@@ -66694,7 +66759,41 @@ var render = function() {
                     _vm._v("(ACTIVE: " + _vm._s(_vm.chunk.status) + ")")
                   ])
                 ]
-              )
+              ),
+              _vm._v(" "),
+              _c("div", { staticClass: "mt-3" }, [
+                _c("div", [
+                  _c("code", [_vm._v("type_name.item_name|item_id")])
+                ]),
+                _vm._v(" "),
+                _c("div", [
+                  _c("code", [
+                    _vm._v(
+                      _vm._s(
+                        _vm.chunkmixins[0]
+                          ? _vm.chunkmixins[0].type
+                          : "type_name"
+                      ) +
+                        "." +
+                        _vm._s(_vm.chunk.id)
+                    )
+                  ])
+                ]),
+                _vm._v(" "),
+                _c("div", [
+                  _c("code", [
+                    _vm._v(
+                      _vm._s(
+                        _vm.chunkmixins[0]
+                          ? _vm.chunkmixins[0].type
+                          : "type_name"
+                      ) +
+                        "." +
+                        _vm._s(_vm.chunk.title)
+                    )
+                  ])
+                ])
+              ])
             ],
             1
           ),
@@ -66714,11 +66813,11 @@ var render = function() {
                   _c("b-form-input", {
                     on: { input: _vm.inputType },
                     model: {
-                      value: _vm.chunk.type,
+                      value: this.selectedType,
                       callback: function($$v) {
-                        _vm.$set(_vm.chunk, "type", $$v)
+                        _vm.$set(this, "selectedType", $$v)
                       },
-                      expression: "chunk.type"
+                      expression: "this.selectedType"
                     }
                   }),
                   _vm._v(" "),
@@ -66728,7 +66827,7 @@ var render = function() {
                       attrs: {
                         slot: "append",
                         text: "Dropdown",
-                        variant: "success"
+                        variant: "danger"
                       },
                       slot: "append"
                     },
@@ -66746,9 +66845,59 @@ var render = function() {
                       )
                     }),
                     0
+                  ),
+                  _vm._v(" "),
+                  _c(
+                    "b-button",
+                    {
+                      attrs: { variant: "outline-primary" },
+                      on: { click: _vm.addType }
+                    },
+                    [_vm._v("+")]
                   )
                 ],
                 1
+              ),
+              _vm._v(" "),
+              _c(
+                "b-list-group",
+                { staticClass: "mt-2" },
+                _vm._l(_vm.chunkmixins, function(mixin) {
+                  return _c(
+                    "span",
+                    [
+                      _c(
+                        "b-list-group-item",
+                        {
+                          staticClass:
+                            "d-flex justify-content-between align-items-center"
+                        },
+                        [
+                          _vm._v(
+                            "\n                        " +
+                              _vm._s(mixin.type) +
+                              "\n                        "
+                          ),
+                          _c(
+                            "b-badge",
+                            {
+                              attrs: { variant: "primary", pill: "" },
+                              on: {
+                                click: function($event) {
+                                  return _vm.chunkmixinRemove(mixin.type)
+                                }
+                              }
+                            },
+                            [_vm._v("RM")]
+                          )
+                        ],
+                        1
+                      )
+                    ],
+                    1
+                  )
+                }),
+                0
               )
             ],
             1
@@ -66797,7 +66946,21 @@ var render = function() {
         [
           _c(
             "b-col",
-            [_c("b-button", { on: { click: _vm.remove } }, [_vm._v("Delete")])],
+            [
+              _c(
+                "b-button",
+                {
+                  directives: [
+                    {
+                      name: "b-modal",
+                      rawName: "v-b-modal.remove",
+                      modifiers: { remove: true }
+                    }
+                  ]
+                },
+                [_vm._v("Delete")]
+              )
+            ],
             1
           ),
           _vm._v(" "),
@@ -66819,7 +66982,22 @@ var render = function() {
       _vm._v(" "),
       _c("div", { staticClass: "spinner", class: { show: _vm.loading } }, [
         _vm._m(0)
-      ])
+      ]),
+      _vm._v(" "),
+      _c(
+        "b-modal",
+        {
+          attrs: { id: "remove", title: "Delete Records" },
+          on: { ok: _vm.remove }
+        },
+        [
+          _c("p", { staticClass: "my-4" }, [
+            _vm._v('Please confirm remove item - "'),
+            _c("strong", [_vm._v(_vm._s(_vm.chunk.title))]),
+            _vm._v('"!')
+          ])
+        ]
+      )
     ],
     1
   )
@@ -66879,11 +67057,19 @@ var render = function() {
     _c("div", {}, [
       _c(
         "ul",
-        { staticClass: "records-menu" },
+        { staticClass: "records-menu-chunks" },
         _vm._l(_vm.chunks, function(chunk) {
-          return _c("li", [
-            _c("a", { attrs: { href: "/chunk/editor/" + chunk.id } }, [
-              _vm._v(_vm._s(chunk.title))
+          return _c("li", { staticClass: "table-grid" }, [
+            _c("span", [
+              _c("a", { attrs: { href: "/chunk/editor/" + chunk.id } }, [
+                _vm._v(_vm._s(chunk.title))
+              ])
+            ]),
+            _vm._v(" "),
+            _c("span", { staticClass: "w-25" }, [
+              chunk.status
+                ? _c("span", [_c("i")])
+                : _c("span", [_c("i", [_vm._v("off")])])
             ])
           ])
         }),
@@ -80087,9 +80273,14 @@ __webpack_require__.r(__webpack_exports__);
 // require('./bootstrap');
 
 
+ // import { library } from '@fortawesome/fontawesome-svg-core';
+// import { faUserSecret } from '@fortawesome/free-solid-svg-icons';
+// import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 
 window.Vue = __webpack_require__(/*! vue */ "./node_modules/vue/dist/vue.common.js");
-Vue.use(bootstrap_vue__WEBPACK_IMPORTED_MODULE_1__["default"]);
+window.Vue.use(bootstrap_vue__WEBPACK_IMPORTED_MODULE_1__["default"]); // library.add(faUserSecret);
+// window.Vue.component('font-awesome-icon', FontAwesomeIcon);
+
 /**
  * The following block of code may be used to automatically register your
  * Vue components. It will recursively scan this directory for the Vue

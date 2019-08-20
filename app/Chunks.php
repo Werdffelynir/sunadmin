@@ -24,9 +24,6 @@ class Chunks extends Model
         'chunks.created_at',
         'chunks.updated_at',
         'chunks.status',
-        'mixins.type as type',
-        'mixins.title as mixins_title',
-        'mixins.id as mixins_id',
     ];
 
     static public function defaultFormData(array $data = null)
@@ -37,9 +34,9 @@ class Chunks extends Model
             'author' => '',
             'created_at' => '',
             'updated_at' => '',
-            'status' => '',
+            'status' => true,
             'type' => '',
-            'mixins_id' => '',
+            'mixins' => [],
         ];
         if ($data) {
             $defaultData = array_merge($defaultData, $data);
@@ -51,11 +48,19 @@ class Chunks extends Model
     {
         $chunks = DB::table('chunks')
             ->select(self::$selectedFields)
-            ->leftJoin('mixins', 'mixins.id_chunk', '=', 'chunks.id')
-            ->where('chunks.id', '=', $id)
+            ->where('id', '=', $id)
             ->get();
 
-        return $chunks;
+        $chunk = $chunks->first();
+
+        $mixins = DB::table('mixins')
+            ->select('id', 'type', 'id_chunk')
+            ->where('id_chunk', '=', $chunk->id)
+            ->get();
+
+        $chunk->mixins = $mixins;
+
+        return $chunk;
     }
 
     static public function getChunksMixins()
@@ -101,27 +106,22 @@ class Chunks extends Model
         return $chunks;
     }
 
-    static public function insertChunk($title, $body, $author, $status, $type)
+    static public function insertChunk($data, $mixins)
     {
         DB::beginTransaction();
 
         $chunkId = DB::table('chunks')
-            ->insertGetId([
-                'title' => $title,
-                'body' => $body,
-                'author' => (int) $author,
-                'created_at' => date('Y-m-d H:i:s'),
-                'status' => $status,
-            ]);
+            ->insertGetId($data);
 
-        $mixin = DB::table('mixins')
-            ->insert([
-                'type' => $type,
-                'title' => $type,
-                'status' => (int) $status,
-                'id_chunk' => $chunkId,
-                'created_at' => date('Y-m-d H:i:s'),
-            ]);
+        foreach ($mixins as $mixin) {
+            DB::table('mixins')
+                ->insert([
+                    'type' => $mixin['type'],
+                    'title' => $mixin['type'],
+                    'id_chunk' => $chunkId,
+                    'updated_at' => date('Y-m-d H:i:s'),
+                ]);
+        }
 
         DB::commit();
 
@@ -134,30 +134,36 @@ class Chunks extends Model
             ->get();
     }
 
-    static public function updateChunk ($chunkId, $data, $type, $mixinsId) {
+    static public function updateChunk ($chunkId, $data, $mixins) {
 
         DB::beginTransaction();
 
-        $result =  DB::table('mixins')->where('id', $mixinsId)->get()->first();
+        DB::table('chunks')
+            ->where('id', $chunkId)
+            ->update($data);
 
+        $result = DB::table('mixins')->where('id_chunk', $chunkId)->delete();
 
-        if ($result && $result->type !== $type) {
+        foreach ($mixins as $mixin) {
             $result = DB::table('mixins')
-                ->where('id', $mixinsId)
-                ->update([
-                    'type' => $type,
-                    'title' => $type,
+                ->insert([
+                    'type' => $mixin['type'],
+                    'title' => $mixin['type'],
+                    'id_chunk' => $chunkId,
                     'updated_at' => date('Y-m-d H:i:s'),
                 ]);
         }
 
-        $data['updated_at'] = date('Y-m-d H:i:s');
-        $result = DB::table('chunks')
-            ->where('id', $chunkId)
-            ->update($data);
-
         DB::commit();
 
+        return !!$result;
+    }
+
+    static public function removeChunk($id, $mixin_id) {
+        DB::beginTransaction();
+        DB::table('chunks')->delete($id);
+        $result = DB::table('mixins')->delete($mixin_id);
+        DB::commit();
         return !!$result;
     }
 
