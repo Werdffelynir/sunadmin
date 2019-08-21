@@ -59,12 +59,15 @@ class ChunksController extends Controller
     public function save() {
         $id = trim(\request('id'));
         $mixins = \request('mixins');
+
         if (empty($mixins))
             $mixins = [['type' => 'main']];
 
         $data = [
+            'name' => trim(\request('name')),
             'title' => trim(\request('title')),
             'body' => trim(\request('body')),
+            'options' => is_array(\request('options')) ? response()->json(\request('options'))->getContent() : '[]',
             'author' => \request('author') ? trim(\request('author')) : 'Anonymous',
             'updated_at' => date('Y-m-d H:i:s'),
             'status' => \request('status') ? 1 : 0,
@@ -88,10 +91,9 @@ class ChunksController extends Controller
     {
         $success = false;
         $id = trim(\request('id'));
-        $mixins_id = trim(\request('mixins_id'));
 
-        if ($id && $mixins_id) {
-            $success = Chunks::removeChunk($id, $mixins_id);
+        if ($id) {
+            $success = Chunks::removeChunk($id);
         }
 
         return response()->json( [

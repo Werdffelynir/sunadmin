@@ -8,7 +8,7 @@
         <div class="">
             <ul class="records-menu-chunks">
                 <li v-for="chunk in chunks" class="table-grid">
-                    <span><a v-bind:href="'/chunk/editor/' + chunk.id">{{chunk.title}}</a></span>
+                    <span><a v-bind:href="'/chunk/editor/' + chunk.id">{{chunk.title}} <span v-if="!!chunk.name" class="chunk_name">({{chunk.name}})</span></a></span>
                     <span class="w-25">
                         <span v-if="chunk.status"> <i></i> </span>
                         <span v-else=""> <i>off</i> </span>
@@ -39,7 +39,14 @@
         text-decoration: underline;
     }
     .records-menu-chunks li {
-        border-bottom: 1px solid #fff;
+        border-bottom: 1px dotted #efefef;
+    }
+
+    .records-menu-chunks a {
+    }
+    .records-menu-chunks a .chunk_name {
+        font-size: 90%;
+        color: #636b6f;
     }
 
     .active {
@@ -52,30 +59,43 @@
         props: ['datachunks', 'datatypes'],
 
         data() {
+            let activeType = 'main';
 
             return {
-                chunks: JSON.parse(this.datachunks),
+                chunks: [],
                 types: JSON.parse(this.datatypes),
-                activeType: 'main',
+                activeType: activeType,
+            }
+        },
+
+        mounted(){
+            const type = localStorage.getItem('selectedTypeList');
+            if (type && type !== this.activeType) {
+                this.chunksByType(type);
+            } else {
+                this.chunksByType(this.activeType);
             }
         },
 
         methods: {
             callChunksByType (e) {
                 const type = e.target.textContent.trim();
-                this.activeType = type;
-                axios
-                    .post('/chunks/type', {type: type})
-                    .then(res => {
-                        this.chunks = res.data.chunks;
-                    })
-                    .catch(err => {
-                        console.error(err)
-                    });
-            }
-        },
+                localStorage.setItem('selectedTypeList', type);
+                this.chunksByType(type);
+            },
 
-        mounted() { },
+            chunksByType (type) {
+                axios.post('/chunks/type', {type: type})
+                .then(res => {
+                    this.chunks = res.data.chunks;
+                    this.activeType = type;
+                })
+                .catch(err => {
+                    console.error(err)
+                });
+            },
+
+        },
 
     }
 </script>

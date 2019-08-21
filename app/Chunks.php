@@ -13,13 +13,15 @@ class Chunks extends Model
     protected $table = "chunks";
 
     protected $fillable = [
-        'title', 'body', 'author', 'created_at', 'updated_at', 'status',
+        'title', 'body', 'options', 'author', 'created_at', 'updated_at', 'status',
     ];
 
     static protected $selectedFields = [
         'chunks.id',
+        'chunks.name',
         'chunks.title',
         'chunks.body',
+        'chunks.options',
         'chunks.author',
         'chunks.created_at',
         'chunks.updated_at',
@@ -30,7 +32,9 @@ class Chunks extends Model
     {
         $defaultData = [
             'title' => '',
+            'name' => '',
             'body' => '',
+            'options' => '',
             'author' => '',
             'created_at' => '',
             'updated_at' => '',
@@ -159,10 +163,13 @@ class Chunks extends Model
         return !!$result;
     }
 
-    static public function removeChunk($id, $mixin_id) {
+    static public function removeChunk($id) {
         DB::beginTransaction();
-        DB::table('chunks')->delete($id);
-        $result = DB::table('mixins')->delete($mixin_id);
+        DB::table('chunks')
+            ->delete($id);
+        $result = DB::table('mixins')
+            ->where('id_chunk', $id)
+            ->delete();
         DB::commit();
         return !!$result;
     }

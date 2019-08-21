@@ -15,9 +15,11 @@ class CreateChunksTable extends Migration
     {
         Schema::create('chunks', function (Blueprint $table) {
             $table->bigIncrements('id');
-            $table->string('title');
-            $table->text('body');
-            $table->string('author');
+            $table->string('name');
+            $table->string('title')->nullable();
+            $table->text('body')->nullable();
+            $table->text('options')->default('[]');
+            $table->string('author')->nullable();
             $table->timestamp('created_at')->nullable();
             $table->timestamp('updated_at')->nullable();
             $table->integer('status')->default(0);

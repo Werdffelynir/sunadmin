@@ -21,7 +21,6 @@ class APIController extends Controller
 
     public function chunk(): string
     {
-
         $title = trim( \request('title'));
         $data = Chunks::getChunksByTitle($title);
 

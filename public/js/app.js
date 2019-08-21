@@ -1838,6 +1838,8 @@ module.exports = {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
 //
 //
 //
@@ -1918,37 +1920,108 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+var TableSimple = function TableSimple() {
+  _classCallCheck(this, TableSimple);
+};
+
 var URL_LIST = '/list';
 var URL_SAVE = '/chunk/editor/';
 /* harmony default export */ __webpack_exports__["default"] = ({
   props: ['datachunk', 'datatypes'],
   data: function data() {
+    var datachunk = JSON.parse(this.datachunk);
+    var datatypes = JSON.parse(this.datatypes);
     return {
-      chunk: JSON.parse(this.datachunk),
-      types: JSON.parse(this.datatypes),
+      chunk: datachunk,
+      types: datatypes,
       loading: false,
       checked: false,
       selectedType: '',
-      chunkmixins: JSON.parse(this.datachunk).mixins.slice(0)
+      chunkoptions: datachunk.options ? JSON.parse(datachunk.options) : [],
+      chunkmixins: datachunk.mixins.slice(0),
+      optionNameCurrent: 'name'
     };
   },
   computed: {},
   mounted: function mounted() {},
   methods: {
+    optionAdd: function optionAdd() {
+      var name = this.optionNameCurrent.trim();
+
+      if (name.length > 1 && !this.chunkoptions.find(function (opt) {
+        return opt.name === name;
+      })) {
+        this.chunkoptions.push({
+          name: name,
+          value: ''
+        });
+        this.optionNameCurrent = '';
+      }
+    },
+    optionRemove: function optionRemove(name) {
+      var _this = this;
+
+      this.chunkoptions.forEach(function (opt, index) {
+        if (opt.name === name) _this.chunkoptions.splice(index, 1);
+      });
+    },
+    optionChange: function optionChange(index, value) {
+      this.chunkoptions[index].value = value;
+    },
     selectType: function selectType(e) {
       this.selectedType = e.target.textContent;
     },
     inputType: function inputType(e) {
       this.selectedType = e;
     },
-    chunkmixinRemove: function chunkmixinRemove(type) {
-      var _this = this;
-
-      this.chunkmixins.forEach(function (m, i) {
-        if (m.type === type) _this.chunkmixins.splice(i, 1);
-      });
-    },
-    addType: function addType(e) {
+    chunkmixinAdd: function chunkmixinAdd(e) {
       var _this2 = this;
 
       if (!!this.selectedType && !this.chunkmixins.filter(function (m) {
@@ -1960,29 +2033,36 @@ var URL_SAVE = '/chunk/editor/';
         this.selectedType = '';
       }
     },
-    save: function save(e) {
+    chunkmixinRemove: function chunkmixinRemove(type) {
       var _this3 = this;
+
+      this.chunkmixins.forEach(function (m, i) {
+        if (m.type === type) _this3.chunkmixins.splice(i, 1);
+      });
+    },
+    save: function save(e) {
+      var _this4 = this;
 
       this.loading = true;
       var chunk = Object.assign({}, this.chunk);
       chunk.mixins = this.chunkmixins;
+      chunk.options = this.chunkoptions;
       axios.post('/chunk/save', chunk).then(function (res) {
         if (res.data.status === 'ok' && res.data.event === 'insert' && res.data.id) location.href = URL_SAVE + res.data.id;
-        _this3.loading = false;
+        _this4.loading = false;
       })["catch"](function (err) {
-        _this3.loading = false;
+        _this4.loading = false;
       });
     },
     remove: function remove(e) {
-      var _this4 = this;
+      var _this5 = this;
 
-      console.log('remove', e);
       this.loading = true;
       axios.post('/chunk/remove', this.chunk).then(function (res) {
         if (res.data.status === 'ok') location.href = URL_LIST;
-        _this4.loading = false;
+        _this5.loading = false;
       })["catch"](function (err) {
-        _this4.loading = false;
+        _this5.loading = false;
       });
     },
     nameToId: function nameToId(name) {
@@ -2052,31 +2132,51 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
 /* harmony default export */ __webpack_exports__["default"] = ({
   props: ['datachunks', 'datatypes'],
   data: function data() {
+    var activeType = 'main';
     return {
-      chunks: JSON.parse(this.datachunks),
+      chunks: [],
       types: JSON.parse(this.datatypes),
-      activeType: 'main'
+      activeType: activeType
     };
+  },
+  mounted: function mounted() {
+    var type = localStorage.getItem('selectedTypeList');
+
+    if (type && type !== this.activeType) {
+      this.chunksByType(type);
+    } else {
+      this.chunksByType(this.activeType);
+    }
   },
   methods: {
     callChunksByType: function callChunksByType(e) {
+      var type = e.target.textContent.trim();
+      localStorage.setItem('selectedTypeList', type);
+      this.chunksByType(type);
+    },
+    chunksByType: function chunksByType(type) {
       var _this = this;
 
-      var type = e.target.textContent.trim();
-      this.activeType = type;
       axios.post('/chunks/type', {
         type: type
       }).then(function (res) {
         _this.chunks = res.data.chunks;
+        _this.activeType = type;
       })["catch"](function (err) {
         console.error(err);
       });
     }
-  },
-  mounted: function mounted() {}
+  }
 });
 
 /***/ }),
@@ -34574,7 +34674,7 @@ exports = module.exports = __webpack_require__(/*! ../../../node_modules/css-loa
 
 
 // module
-exports.push([module.i, "\n.records-bar {\n    width: 20%;\n    height: 100%;\n    color: #343a40;\n}\n.records-menu, .records-menu-chunks {\n    list-style: none;\n    padding: 0;\n    margin: 0;\n}\n.records-menu li {\n    cursor: pointer;\n}\n.records-menu li:hover {\n    text-decoration: underline;\n}\n.records-menu-chunks li {\n    border-bottom: 1px solid #fff;\n}\n.active {\n    text-decoration: underline;\n}\n", ""]);
+exports.push([module.i, "\n.records-bar {\n    width: 20%;\n    height: 100%;\n    color: #343a40;\n}\n.records-menu, .records-menu-chunks {\n    list-style: none;\n    padding: 0;\n    margin: 0;\n}\n.records-menu li {\n    cursor: pointer;\n}\n.records-menu li:hover {\n    text-decoration: underline;\n}\n.records-menu-chunks li {\n    border-bottom: 1px dotted #efefef;\n}\n.records-menu-chunks a {\n}\n.records-menu-chunks a .chunk_name {\n    font-size: 90%;\n    color: #636b6f;\n}\n.active {\n    text-decoration: underline;\n}\n", ""]);
 
 // exports
 
@@ -66762,37 +66862,7 @@ var render = function() {
               ),
               _vm._v(" "),
               _c("div", { staticClass: "mt-3" }, [
-                _c("div", [
-                  _c("code", [_vm._v("type_name.item_name|item_id")])
-                ]),
-                _vm._v(" "),
-                _c("div", [
-                  _c("code", [
-                    _vm._v(
-                      _vm._s(
-                        _vm.chunkmixins[0]
-                          ? _vm.chunkmixins[0].type
-                          : "type_name"
-                      ) +
-                        "." +
-                        _vm._s(_vm.chunk.id)
-                    )
-                  ])
-                ]),
-                _vm._v(" "),
-                _c("div", [
-                  _c("code", [
-                    _vm._v(
-                      _vm._s(
-                        _vm.chunkmixins[0]
-                          ? _vm.chunkmixins[0].type
-                          : "type_name"
-                      ) +
-                        "." +
-                        _vm._s(_vm.chunk.title)
-                    )
-                  ])
-                ])
+                _c("div", [_c("code", [_vm._v("type_name.item_name|item_id")])])
               ])
             ],
             1
@@ -66851,7 +66921,7 @@ var render = function() {
                     "b-button",
                     {
                       attrs: { variant: "outline-primary" },
-                      on: { click: _vm.addType }
+                      on: { click: _vm.chunkmixinAdd }
                     },
                     [_vm._v("+")]
                   )
@@ -66865,6 +66935,7 @@ var render = function() {
                 _vm._l(_vm.chunkmixins, function(mixin) {
                   return _c(
                     "span",
+                    { staticClass: "pt-1" },
                     [
                       _c(
                         "b-list-group-item",
@@ -66888,7 +66959,7 @@ var render = function() {
                                 }
                               }
                             },
-                            [_vm._v("RM")]
+                            [_vm._v("Remove")]
                           )
                         ],
                         1
@@ -66905,6 +66976,32 @@ var render = function() {
         ],
         1
       ),
+      _vm._v(" "),
+      _c("div", { staticClass: "text-right row " }, [
+        _c(
+          "div",
+          { staticClass: "col-4" },
+          [
+            _c(
+              "b-input-group",
+              { staticClass: "mt-3", attrs: { prepend: "NAME" } },
+              [
+                _c("b-form-input", {
+                  model: {
+                    value: _vm.chunk.name,
+                    callback: function($$v) {
+                      _vm.$set(_vm.chunk, "name", $$v)
+                    },
+                    expression: "chunk.name"
+                  }
+                })
+              ],
+              1
+            )
+          ],
+          1
+        )
+      ]),
       _vm._v(" "),
       _c(
         "b-input-group",
@@ -66928,6 +67025,7 @@ var render = function() {
         { staticClass: "mt-3", attrs: { prepend: "BODY" } },
         [
           _c("b-form-textarea", {
+            attrs: { rows: "5" },
             model: {
               value: _vm.chunk.body,
               callback: function($$v) {
@@ -66940,80 +67038,228 @@ var render = function() {
         1
       ),
       _vm._v(" "),
+      _c("h4", { staticClass: "mt-4 text-right" }, [_vm._v("OPTIONS")]),
+      _vm._v(" "),
       _c(
-        "b-row",
+        "div",
+        { staticClass: "mt-2" },
+        [
+          _c("div", { staticClass: "text-right row " }, [
+            _c("div", { staticClass: "col" }),
+            _vm._v(" "),
+            _c(
+              "div",
+              { staticClass: "col-4" },
+              [
+                _c("b-form-input", {
+                  attrs: { small: "" },
+                  model: {
+                    value: _vm.optionNameCurrent,
+                    callback: function($$v) {
+                      _vm.optionNameCurrent = $$v
+                    },
+                    expression: "optionNameCurrent"
+                  }
+                })
+              ],
+              1
+            ),
+            _vm._v(" "),
+            _c(
+              "div",
+              { staticClass: "col-2" },
+              [
+                _c(
+                  "b-button",
+                  { attrs: { variant: "dark" }, on: { click: _vm.optionAdd } },
+                  [_vm._v("Add Option")]
+                )
+              ],
+              1
+            )
+          ]),
+          _vm._v(" "),
+          _c("i", { staticClass: "fas fa-coffee fa-xs" }),
+          _vm._v(" "),
+          _c(
+            "b-table-simple",
+            {
+              staticClass: "mt-2",
+              attrs: { small: "", stacked: "", "table-dark": "" }
+            },
+            [
+              _c(
+                "b-tbody",
+                [
+                  _c(
+                    "b-tr",
+                    [
+                      _c(
+                        "b-td",
+                        _vm._l(_vm.chunkoptions, function(option, index) {
+                          return _c("div", { staticClass: "row mt-2" }, [
+                            _c(
+                              "div",
+                              { staticClass: "col-9" },
+                              [
+                                _c("b-form-input", {
+                                  attrs: { small: "", value: option.value },
+                                  on: {
+                                    change: function(v) {
+                                      return _vm.optionChange(index, v)
+                                    }
+                                  }
+                                })
+                              ],
+                              1
+                            ),
+                            _vm._v(" "),
+                            _c("div", { staticClass: "col pt-2" }, [
+                              _vm._v(_vm._s(option.name))
+                            ]),
+                            _vm._v(" "),
+                            _c(
+                              "div",
+                              { staticClass: "col text-right" },
+                              [
+                                _c(
+                                  "b-button",
+                                  {
+                                    attrs: { variant: "light" },
+                                    on: {
+                                      click: function($event) {
+                                        return _vm.optionRemove(option.name)
+                                      }
+                                    }
+                                  },
+                                  [_vm._v("X")]
+                                )
+                              ],
+                              1
+                            )
+                          ])
+                        }),
+                        0
+                      )
+                    ],
+                    1
+                  )
+                ],
+                1
+              )
+            ],
+            1
+          ),
+          _vm._v(" "),
+          _c("hr")
+        ],
+        1
+      ),
+      _vm._v(" "),
+      _c(
+        "div",
         { staticClass: "mt-3" },
         [
           _c(
-            "b-col",
+            "b-row",
             [
               _c(
-                "b-button",
-                {
-                  directives: [
+                "b-col",
+                [
+                  _c(
+                    "b-button",
                     {
-                      name: "b-modal",
-                      rawName: "v-b-modal.remove",
-                      modifiers: { remove: true }
-                    }
-                  ]
-                },
-                [_vm._v("Delete")]
+                      directives: [
+                        {
+                          name: "b-modal",
+                          rawName: "v-b-modal.remove",
+                          modifiers: { remove: true }
+                        }
+                      ]
+                    },
+                    [_vm._v("Delete")]
+                  )
+                ],
+                1
+              ),
+              _vm._v(" "),
+              _c(
+                "b-col",
+                { staticClass: "text-right" },
+                [
+                  _c(
+                    "b-row",
+                    [
+                      _c("b-col", [
+                        _c(
+                          "span",
+                          {
+                            staticClass: "spinner",
+                            class: { show: _vm.loading }
+                          },
+                          [
+                            _c(
+                              "div",
+                              {
+                                staticClass: "spinner-grow",
+                                attrs: { role: "status" }
+                              },
+                              [
+                                _c("span", { staticClass: "sr-only" }, [
+                                  _vm._v("Loading...")
+                                ])
+                              ]
+                            )
+                          ]
+                        )
+                      ]),
+                      _vm._v(" "),
+                      _c(
+                        "b-col",
+                        [
+                          _c(
+                            "b-button",
+                            {
+                              attrs: { variant: "primary" },
+                              on: { click: _vm.save }
+                            },
+                            [_vm._v("Save")]
+                          )
+                        ],
+                        1
+                      )
+                    ],
+                    1
+                  )
+                ],
+                1
               )
             ],
             1
           ),
           _vm._v(" "),
           _c(
-            "b-col",
-            { staticClass: "text-right" },
+            "b-modal",
+            {
+              attrs: { id: "remove", title: "Delete Records" },
+              on: { ok: _vm.remove }
+            },
             [
-              _c(
-                "b-button",
-                { attrs: { variant: "success" }, on: { click: _vm.save } },
-                [_vm._v("Save")]
-              )
-            ],
-            1
+              _c("p", { staticClass: "my-4" }, [
+                _vm._v('Please confirm remove item - "'),
+                _c("strong", [_vm._v(_vm._s(_vm.chunk.title))]),
+                _vm._v('"!')
+              ])
+            ]
           )
         ],
         1
-      ),
-      _vm._v(" "),
-      _c("div", { staticClass: "spinner", class: { show: _vm.loading } }, [
-        _vm._m(0)
-      ]),
-      _vm._v(" "),
-      _c(
-        "b-modal",
-        {
-          attrs: { id: "remove", title: "Delete Records" },
-          on: { ok: _vm.remove }
-        },
-        [
-          _c("p", { staticClass: "my-4" }, [
-            _vm._v('Please confirm remove item - "'),
-            _c("strong", [_vm._v(_vm._s(_vm.chunk.title))]),
-            _vm._v('"!')
-          ])
-        ]
       )
     ],
     1
   )
 }
-var staticRenderFns = [
-  function() {
-    var _vm = this
-    var _h = _vm.$createElement
-    var _c = _vm._self._c || _h
-    return _c(
-      "div",
-      { staticClass: "spinner-grow", attrs: { role: "status" } },
-      [_c("span", { staticClass: "sr-only" }, [_vm._v("Loading...")])]
-    )
-  }
-]
+var staticRenderFns = []
 render._withStripped = true
 
 
@@ -67062,7 +67308,12 @@ var render = function() {
           return _c("li", { staticClass: "table-grid" }, [
             _c("span", [
               _c("a", { attrs: { href: "/chunk/editor/" + chunk.id } }, [
-                _vm._v(_vm._s(chunk.title))
+                _vm._v(_vm._s(chunk.title) + " "),
+                !!chunk.name
+                  ? _c("span", { staticClass: "chunk_name" }, [
+                      _vm._v("(" + _vm._s(chunk.name) + ")")
+                    ])
+                  : _vm._e()
               ])
             ]),
             _vm._v(" "),
