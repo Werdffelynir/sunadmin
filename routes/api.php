@@ -18,10 +18,9 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
     return $request->user();
 });
 
-
 // Without authorization
 // endpoints
 
-Route::post('/chunk', 'APIController@chunk')->name('chunk');
+Route::get('/chunks', 'APIController@chunks')->name('chunks');
+Route::post('/email', 'APIController@email')->name('email');
 
-Route::post('/mixin', 'APIController@mixin')->name('mixin');

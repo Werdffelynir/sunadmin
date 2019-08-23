@@ -4,12 +4,12 @@ namespace App\Http\Controllers;
 
 use App\Chunks;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Mail;
 
 class APIController extends Controller
 {
     protected $dataResponse = [
-        'error' => false,
-        'success' => false,
+        'ok' => false,
         'data' => false,
         'length' => 0,
     ];
@@ -19,35 +19,49 @@ class APIController extends Controller
         return array_merge($this->dataResponse , $data);
     }
 
-    public function chunk(): string
+    public function chunks(): string
     {
-        $title = trim( \request('title'));
-        $data = Chunks::getChunksByTitle($title);
+        $key = trim( \request('key'));
+        $data = Chunks::getChunksByType($key);
 
         $dataResponse = $this->prepareDataResponse([
-            'success' => !!$data,
-            'error' => !$data,
+            'ok' => !!$data,
             'data' => $data,
             'length' => count($data),
         ]);
 
-        return response()->json( $dataResponse );
+        return response()
+            ->json($dataResponse)
+            ->getContent();
     }
 
-    public function mixin(): string
+    public function email()
     {
-        $type = trim( \request('type'));
-        $title = trim( \request('title'));
-        $data = Chunks::getMixinsByTitle($title);
+        $file = \request('file');
+        $subject = trim( \request('subject'));
+        $message = trim( \request('message'));
 
-        $dataResponse = $this->prepareDataResponse([
-            'success' => !!$data,
-            'error' => !$data,
-            'data' => $data,
-            'length' => count($data),
-        ]);
+        $data = [
+            'file' => $file,
+            'subject' => $subject,
+            'message' => $message
+        ];
 
-        return response()->json( $dataResponse );
+        $from = 'werdffelynir@gmail.com';
+        $fromName = 'Laravel';
+        $to = 'werdffelynir@gmail.com';
+        $toName = 'Werdffelynir OL';
+        $subject = 'Hello';
+        $pathToFile = '';
+
+        Mail::send('emails.sunmail', $data, function(\Illuminate\Mail\Message $message) use ($from, $fromName, $to, $toName, $subject, $pathToFile) {
+            $message->subject($subject);
+            $message->from($from, $fromName);
+            $message->to($to, $toName);
+
+            if ($pathToFile)
+                $message->attach($pathToFile);
+        });
+
     }
-
 }

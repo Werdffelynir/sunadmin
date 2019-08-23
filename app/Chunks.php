@@ -88,27 +88,6 @@ class Chunks extends Model
         return $chunks;
     }
 
-    static public function getChunksByTitle($title)
-    {
-        $chunks = DB::table('chunks')
-            ->select(self::$selectedFields)
-            ->leftJoin('mixins', 'mixins.id_chunk', '=', 'chunks.id')
-            ->where('chunks.title', '=', $title)
-            ->get();
-
-        return $chunks;
-    }
-
-    static public function getMixinsByTitle($title)
-    {
-        $chunks = DB::table('chunks')
-            ->select(self::$selectedFields)
-            ->leftJoin('mixins', 'mixins.id_chunk', '=', 'chunks.id')
-            ->where('mixins.title', '=', $title)
-            ->get();
-
-        return $chunks;
-    }
 
     static public function insertChunk($data, $mixins)
     {
@@ -130,12 +109,6 @@ class Chunks extends Model
         DB::commit();
 
         return $chunkId;
-    }
-
-    static public function incomplete () {
-        return static::where('status', 0)
-            ->leftJoin('mixins', 'mixins.id', '=', 'chunks.id')
-            ->get();
     }
 
     static public function updateChunk ($chunkId, $data, $mixins) {
