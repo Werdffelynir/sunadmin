@@ -18,7 +18,7 @@
                     <b-form-input v-model="this.selectedType" v-on:input="inputType"></b-form-input>
 
                     <b-dropdown text="Dropdown" variant="danger" slot="append">
-                        <span v-for="type in types">
+                        <span v-if="types" v-for="type in types">
                             <b-dropdown-item v-on:click="selectType">{{ type.type }}</b-dropdown-item>
                         </span>
                     </b-dropdown>
@@ -136,6 +136,8 @@
 
     export default {
 
+        name: 'Edit',
+
         props: ['datachunk', 'datatypes'],
 
         data() {
@@ -180,11 +182,13 @@
             },
 
             selectType (e) {
-                this.selectedType = e.target.textContent;
+                console.log('>>>', e);
+                 this.selectedType = e.target.textContent;
             },
 
             inputType (e) {
-                this.selectedType = e;
+                console.log('>>>', e);
+                 return this.selectedType = e;
             },
 
             chunkmixinAdd (e) {

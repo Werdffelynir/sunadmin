@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class DashboardController extends Controller
 {
@@ -23,6 +24,15 @@ class DashboardController extends Controller
      */
     public function index()
     {
-        return view('dashboard');
+        $user = Auth::user();
+
+        return view('dashboard', [
+            'id' => $user->id,
+            'name' => $user->name,
+            'email' => $user->email,
+            'created_at' => $user->created_at,
+            'company' => $user->company,
+            'domain' => $user->domain,
+        ]);
     }
 }

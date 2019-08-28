@@ -8,7 +8,7 @@ use Illuminate\Support\Facades\Response;
 class Cors
 {
     private static $allowedOriginsWhitelist = [
-        'http://localhost:8000'
+        '*'
     ];
 
     // All the headers must be a string
@@ -46,7 +46,7 @@ class Cors
             'Access-Control-Allow-Credentials'  => static::$allowCredentials,
         ];
 
-        // For preflighted requests
+        // For preflight requests
         if ($request->getMethod() === 'OPTIONS')
         {
             return response('', 200)->withHeaders($headers);

@@ -4,6 +4,7 @@ namespace App;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
 class Chunks extends Model
@@ -101,6 +102,7 @@ class Chunks extends Model
                 ->insert([
                     'type' => $mixin['type'],
                     'title' => $mixin['type'],
+                    'id_user' => Auth::id(),
                     'id_chunk' => $chunkId,
                     'updated_at' => date('Y-m-d H:i:s'),
                 ]);
@@ -126,6 +128,7 @@ class Chunks extends Model
                 ->insert([
                     'type' => $mixin['type'],
                     'title' => $mixin['type'],
+                    'id_user' => Auth::id(),
                     'id_chunk' => $chunkId,
                     'updated_at' => date('Y-m-d H:i:s'),
                 ]);
@@ -138,11 +141,15 @@ class Chunks extends Model
 
     static public function removeChunk($id) {
         DB::beginTransaction();
-        DB::table('chunks')
-            ->delete($id);
+
         $result = DB::table('mixins')
             ->where('id_chunk', $id)
+            ->where('id_user', Auth::id())
             ->delete();
+
+        DB::table('chunks')
+            ->delete($id);
+
         DB::commit();
         return !!$result;
     }

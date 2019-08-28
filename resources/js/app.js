@@ -32,6 +32,7 @@ window.Vue.use(BootstrapVue);
 // files.keys().map(key => Vue.component(key.split('/').pop().split('.')[0], files(key).default));
 // Vue.component('example-component', require('./components/ExampleComponent.vue').default);
 // Vue.component('chunkform', require('./components/ChunkFromComponent.vue').default);
+
 Vue.component('records-component', require('./components/RecordsComponent.vue').default);
 Vue.component('edit-component', require('./components/EditComponent.vue').default);
 

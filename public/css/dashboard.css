@@ -1,0 +1,14 @@
+.dashboard-grid {
+  display: grid;
+  grid-template-areas: "profile domain" "* company";
+  grid-template-rows: [row] auto [row] auto;
+  grid-template-columns: [col] 49% [col] 49%;
+  grid-gap: 10px;
+}
+
+@media screen and (max-width: 992px) {
+  .dashboard-grid {
+    display: block;
+  }
+}
+

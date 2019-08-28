@@ -61,6 +61,32 @@
                             </div>
                         </div>
 
+                        <div class="form-group row">
+                            <label for="company" class="col-md-4 col-form-label text-md-right">{{ __('Your Company') }}</label>
+
+                            <div class="col-md-6">
+                                <input id="company" type="text" class="form-control" name="company" value="{{ old('company') }}" required autocomplete="company">
+                            </div>
+                            @error('company')
+                            <span class="invalid-feedback" role="alert">
+                                        <strong>{{ $message }}</strong>
+                                    </span>
+                            @enderror
+                        </div>
+
+                        <div class="form-group row">
+                            <label for="domain" class="col-md-4 col-form-label text-md-right">{{ __('Site Domain') }}</label>
+
+                            <div class="col-md-6">
+                                <input id="domain" type="text" class="form-control" name="domain" value="{{ old('domain') }}" required autocomplete="domain">
+                            </div>
+                            @error('domain')
+                            <span class="invalid-feedback" role="alert">
+                                        <strong>{{ $message }}</strong>
+                                    </span>
+                            @enderror
+                        </div>
+
                         <div class="form-group row mb-0">
                             <div class="col-md-6 offset-md-4">
                                 <button type="submit" class="btn btn-primary">

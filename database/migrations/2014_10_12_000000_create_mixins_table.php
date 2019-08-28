@@ -17,6 +17,7 @@ class CreateMixinsTable extends Migration
             $table->bigIncrements('id');
             $table->string('title');
             $table->string('type');
+            $table->string('id_user');
             $table->string('id_chunk');
             $table->timestamp('created_at')->nullable();
             $table->timestamp('updated_at')->nullable();
