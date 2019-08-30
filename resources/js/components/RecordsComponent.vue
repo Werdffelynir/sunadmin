@@ -1,5 +1,5 @@
 <template>
-    <div class="table-grid">
+    <div class="table">
         <div class="records-bar">
             <ul class="records-menu">
                 <li v-for="type in types" v-bind:class="{active: activeType === type.type}" v-on:click="callChunksByType">{{type.type}}</li>
@@ -18,41 +18,6 @@
         </div>
     </div>
 </template>
-
-<style>
-
-    .records-bar {
-        width: 20%;
-        height: 100%;
-        color: #343a40;
-    }
-
-    .records-menu, .records-menu-chunks {
-        list-style: none;
-        padding: 0;
-        margin: 0;
-    }
-    .records-menu li {
-        cursor: pointer;
-    }
-    .records-menu li:hover {
-        text-decoration: underline;
-    }
-    .records-menu-chunks li {
-        border-bottom: 1px dotted #efefef;
-    }
-
-    .records-menu-chunks a {
-    }
-    .records-menu-chunks a .chunk_name {
-        font-size: 90%;
-        color: #636b6f;
-    }
-
-    .active {
-        text-decoration: underline;
-    }
-</style>
 
 <script>
     export default {
@@ -99,3 +64,35 @@
 
     }
 </script>
+
+<style>
+
+    .records-bar {
+        width: 20%;
+        height: 100%;
+        color: #343a40;
+    }
+    .records-menu, .records-menu-chunks {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+    }
+    .records-menu li {
+        cursor: pointer;
+    }
+    .records-menu li:hover {
+        text-decoration: underline;
+    }
+    .records-menu-chunks li {
+        border-bottom: 1px dotted #efefef;
+    }
+    .records-menu-chunks a {
+    }
+    .records-menu-chunks a .chunk_name {
+        font-size: 90%;
+        color: #636b6f;
+    }
+    .active {
+        text-decoration: underline;
+    }
+</style>

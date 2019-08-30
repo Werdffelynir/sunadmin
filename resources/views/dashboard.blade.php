@@ -6,17 +6,17 @@
 
     <div class="container">
         <div class="row justify-content-center">
-            <div class="col-md-10">
+            <div class="col-md-12">
                 <div class="card">
                     <div class="card-header">Dashboard</div>
 
-                    <div class="card-body">
-                        @if (session('status'))
+                    @if (session('status'))
+                        <div class="card-body">
                             <div class="alert alert-success" role="alert">
                                 {{ session('status') }}
                             </div>
-                        @endif
-                    </div>
+                        </div>
+                    @endif
 
                     <div class="dashboard-grid p-2">
                         <div class="company">

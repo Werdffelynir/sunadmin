@@ -12921,3 +12921,16 @@ body,
   height: 100%;
 }
 
+.table {
+  display: table;
+}
+
+.table > div {
+  display: table-cell;
+}
+
+.topmenu a {
+  padding: 5px 10px;
+  color: #f6993f;
+}
+

@@ -27,3 +27,5 @@ Route::post('/chunks/type', 'ChunksController@chunksType')->name('chunks/type');
 Route::post('/chunk/save', 'ChunksController@save')->name('chunks/save');
 Route::post('/chunk/remove', 'ChunksController@remove')->name('chunks/remove');
 
+
+Route::get('/mixins', 'MixinsController@index')->name('mixins');

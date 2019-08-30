@@ -63,5 +63,8 @@ class APIController extends Controller
                 $message->attach($pathToFile);
         });
 
+        return response()
+            ->json($data)
+            ->getContent();
     }
 }
